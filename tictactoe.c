@@ -1,7 +1,6 @@
 #include "tictactoe.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 
 
 grid create_empty_grid(void){

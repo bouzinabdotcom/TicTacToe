@@ -16,7 +16,7 @@ int main(){
     int available;
     int x, y;
 
-    srand(time(NULL));
+    srand(time(NULL)); //init seed for the rand() call in the random_player function
 
     do {
         play_again = 0;
