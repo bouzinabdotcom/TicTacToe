@@ -22,7 +22,7 @@ Execute:
 
     $ ./tictactoe
 
-This prompts are intuitive no need for explanation there.
+The prompts are intuitive no need for explanation there.
 
 # Working on 
 
