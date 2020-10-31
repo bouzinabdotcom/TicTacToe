@@ -21,3 +21,6 @@ char celltochar(int);
 
 void printg(grid);
 void print_result(result);
+
+//random player
+void random_player(int, grid); // call srand(time(NULL)) before calling this function

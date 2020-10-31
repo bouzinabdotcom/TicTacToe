@@ -1,6 +1,7 @@
 #include "tictactoe.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 
 grid create_empty_grid(void){
@@ -98,3 +99,13 @@ void print_result(result r){
     }
 }
 
+void random_player(int player, grid g) {
+    //seed should be initialized before calling this function
+    int x, y;
+    do{
+        x = rand()%3;
+        y = rand()%3; 
+    }while(g[y][x] != EMPTY);
+
+    g[y][x] = player;
+}
