@@ -24,6 +24,6 @@ Execute:
 
 The prompts are intuitive no need for explanation there.
 
-# Working on 
+# Aritificial Intelligence 
 
-Make it possible to play against the computer with different levels of difficulty.
+Uses symbolic ai with minimax algorithm. (impossible to beat)
