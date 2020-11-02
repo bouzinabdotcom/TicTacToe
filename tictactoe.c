@@ -108,3 +108,68 @@ void random_player(int player, grid g) {
 
     g[y][x] = player;
 }
+
+int max(int a, int b) {
+    return a>b?a:b;
+}
+
+int min(int a, int b) {
+    return a<=b?a:b;
+}
+
+int minimax(grid g, int maximizingPlayer) {
+    result res = game_state(g);
+    if(res != NOT_FINISHED){
+        return res;
+    }
+    int value;
+    if(maximizingPlayer==X){
+        value = -2;
+        for(int i=0; i<3; i++){
+            for(int j=0; j<3; j++){
+                if(g[i][j] == EMPTY){
+                    g[i][j] = X;
+                    value = max(value, minimax(g, O));
+                    g[i][j] = EMPTY;
+                }
+            }
+        }
+    }
+
+    if(maximizingPlayer==O){
+        value = 2;
+        for(int i=0; i<3; i++){
+            for(int j=0; j<3; j++){
+                if(g[i][j] == EMPTY){
+                    g[i][j] = O;
+                    value = min(value, minimax(g, X));
+                    g[i][j] = EMPTY;
+                }
+            }
+        }
+    }
+
+    return value;
+
+}
+
+void bestMove(grid g) {
+    int bestScore = -2, score;
+    int x, y;
+    for(int i=0; i<3; i++){
+            for(int j=0; j<3; j++){
+                if(g[i][j] == EMPTY){
+                    g[i][j] = X;
+                    score = minimax(g, O);
+                    g[i][j] = EMPTY;
+                    if(score>bestScore){
+                        bestScore = score;
+                        x=i;
+                        y=j;
+                    }
+                }
+            }
+    }
+    g[x][y] = X;
+
+}

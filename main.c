@@ -10,36 +10,46 @@ int main(){
     grid g;
     int play_again;
     char answer;
-    int moves;
     int player;
-    int randomPlayer=0;
+    int computer, ai;
     int available;
     int x, y;
 
     srand(time(NULL)); //init seed for the rand() call in the random_player function
 
     do {
+        computer=0;
+        ai=0;
         play_again = 0;
-        moves = 0;
         g = create_empty_grid();
         printg(g);
-
-        printf("Do you wanna play against a random player (computer picking random cells) (y/n): ");
+        
+        printf("Do you wanna play against the computer ?(y/n): ");
+        fflush(stdin);
         scanf("%c", &answer);
-        if(answer=='y' || answer=='Y') randomPlayer=1;
+        if(answer=='y' || answer=='Y') computer=1;
+
+        printf("Do you wanna play against AI ? (impossible to beat) (y/n): ");
+        fflush(stdin);
+        scanf("%c", &answer);
+        if(answer=='y' || answer=='Y') ai=1;
+
+        player = O;
 
 
         do{
+            
             available = 1; //always available until proven otherwise
-            moves++;
-            player=moves%2; // 1 for X and 0 for O
+            player=-player; // 1 for X and 0 for O
 
             
                 
             
             printf("%c\'s turn.\n", celltochar(player));
-            if(player == X && randomPlayer){
-                random_player(player, g);
+            if(player == X && computer){
+                // random_player(player, g);
+                if(ai) bestMove(g);
+                else random_player(X, g);
             }
             else{
                 do {
