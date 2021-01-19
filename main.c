@@ -1,19 +1,102 @@
-#include "tictactoe.h"
+#include "ez-draw.h"
+#include "morpion/tictactoe.h"
+
 #include <stdio.h>
+#include <stdio_ext.h>
 #include <time.h>
+#include <limits.h>
 #include <stdlib.h>
 
 
-int main(){
+int l = 600, w = 600;
+grid g;
+result r;
 
 
-    grid g;
-    int play_again;
+
+void win1_on_expose(Ez_event *ev) {
+    for(int i=1; i<N; i++){
+        ez_draw_line(ev->win,  i*l/N,  0, i*l/N,  w);
+        ez_draw_line(ev->win,  0,  i*w/N, w, i*w/N);
+
+    }
+}
+
+int getcoord(int xy) {
+    return xy/(l/N);
+}
+
+void make_move_on_click(Ez_event *ev) {
+    //O's turn
+    int x = getcoord(ev->mx);
+    int y = getcoord(ev->my);
+
+    
+    if(g[y][x] == EMPTY) {
+        ez_draw_circle(ev->win, x*(l/N)+10, y*(l/N)+10, (x+1)*(w/N)-10, (y+1)*(w/N)-10);
+        g[y][x] = O;
+
+        //x's turn
+
+        MinMax_abp_xy(g, INT_MIN, INT_MAX, &y, &x);
+        ez_draw_line(ev->win,  x*(l/N)+10, y*(l/N)+10, (x+1)*(w/N)-10, (y+1)*(w/N)-10);
+        ez_draw_line(ev->win,  x*(l/N)+10, (y+1)*(l/N)-10, (x+1)*(w/N)-10, y*(w/N)+10);
+        g[y][x] = X;
+        printg(g);
+
+        if(game_state(g) != NOT_FINISHED) {
+            
+            ez_set_color(ez_black);
+            ez_fill_rectangle(ev->win, 0, 0, l-1, w-1);
+            r = game_state(g);
+            print_result(r);
+            ez_set_color(ez_white);
+            if(r == DRAW)
+                ez_draw_text (ev->win, EZ_MC, l/2, w/2, "DRAW");
+            else 
+                ez_draw_text (ev->win, EZ_MC, l/2, w/2, "%s WINS", r==X_WINS ? "X" : "O");
+
+
+        }
+    }
+
+} 
+
+
+void win1_on_event (Ez_event *ev)                /* Called by ez_main_loop() */
+{                                                /* for each event on win1   */
+    switch (ev->type) {
+        case Expose   : win1_on_expose(ev); break;
+        case ButtonPress : make_move_on_click(ev); break;
+    }
+}
+
+void init_game(int size) {
+    if(ez_init() < 0) exit(1);
+    N = size;
+    ez_window_create(l, w, "TicTacToe", win1_on_event);
+    ez_set_thick(3);
+
+    
+    g = create_empty_grid(); 
+    
+
+    ez_main_loop();
+
+    exit(0);
+
+}
+
+
+
+
+
+
+
+int main() {
+
+    
     char answer;
-    int player;
-    int computer, ai, first_move=1;
-    int available;
-    int x, y;
     int temp;
 
     srand(time(NULL)); //init seed for the rand() call in the random_player function
@@ -25,77 +108,7 @@ int main(){
     }while(N<2);
 
 
-    do {
-        computer=0;
-        ai=0;
-        play_again = 0;
-        g = create_empty_grid();
-        printg(g);
-        
-        printf("Do you wanna play against the computer ?(y/n): ");
-        fflush(stdin);
-        scanf("%c", &answer);
-        if(answer=='y' || answer=='Y') computer=1;
-
-        printf("Do you wanna play against AI ? (impossible to beat) (y/n): ");
-        fflush(stdin);
-        scanf("%c", &answer);
-        if(answer=='y' || answer=='Y') ai=1;
-
-        player = O;
+    init_game(N);
 
 
-        do{
-            
-            available = 1; //always available until proven otherwise
-            player=-player; // 1 for X and 0 for O
-
-            
-                
-            
-            printf("%c\'s turn.\n", celltochar(player));
-            if(player == X && computer){
-                // random_player(player, g);
-                if(ai && first_move){
-                    g[0][0] = player;
-                    first_move = 0;
-                } 
-                else if(ai) MinMax(g);
-                else random_player(X, g);
-            }
-            else{
-                do {
-                
-                    if(!available)
-                        puts("That cell is not available choose another one.");
-
-                    if(x>N-1 || y>N-1) {
-                        puts("line and column should be between 0 and 2.");
-                    }
-                    printf("Choose line: ");
-                    fflush(stdin);
-                    scanf("%d", &y);
-                    printf("Choose column: ");
-                    fflush(stdin);
-                    scanf("%d", &x);
-                    available = (g[y][x] == EMPTY);
-                }while(!available || x > N-1 || y>N-1);
-                g[y][x] = player;
-
-            }
-            
-
-            
-            
-            printg(g);
-        }while(game_state(g)==NOT_FINISHED);
-
-        print_result(game_state(g));
-        printf("Play again ? (Y/N): ");
-        fflush(stdin);
-        scanf("%c", &answer);
-        if(answer == 'y' || answer == 'Y') play_again=1;
-    }while(play_again);
-
-    return 0;
 }
