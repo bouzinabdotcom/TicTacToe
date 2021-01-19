@@ -11,11 +11,19 @@ int main(){
     int play_again;
     char answer;
     int player;
-    int computer, ai;
+    int computer, ai, first_move=1;
     int available;
     int x, y;
+    int temp;
 
     srand(time(NULL)); //init seed for the rand() call in the random_player function
+
+    do{
+        printf("Please choose size of grid (>1): ");
+        scanf("%d", &temp);
+        setN(temp);
+    }while(N<2);
+
 
     do {
         computer=0;
@@ -48,7 +56,11 @@ int main(){
             printf("%c\'s turn.\n", celltochar(player));
             if(player == X && computer){
                 // random_player(player, g);
-                if(ai) bestMove(g);
+                if(ai && first_move){
+                    g[0][0] = player;
+                    first_move = 0;
+                } 
+                else if(ai) MinMax(g);
                 else random_player(X, g);
             }
             else{
@@ -57,7 +69,7 @@ int main(){
                     if(!available)
                         puts("That cell is not available choose another one.");
 
-                    if(x>2 || y>2) {
+                    if(x>N-1 || y>N-1) {
                         puts("line and column should be between 0 and 2.");
                     }
                     printf("Choose line: ");
@@ -67,7 +79,7 @@ int main(){
                     fflush(stdin);
                     scanf("%d", &x);
                     available = (g[y][x] == EMPTY);
-                }while(!available || x > 2 || y>2);
+                }while(!available || x > N-1 || y>N-1);
                 g[y][x] = player;
 
             }

@@ -1,13 +1,19 @@
 #include "tictactoe.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 
+int N;
+
+void setN(int val) {
+    N = val;
+}
 
 grid create_empty_grid(void){
-    grid g = (grid)malloc(3*sizeof(int*));
-    for(int i=0; i<3; i++){
-        *(g+i) = (int*)malloc(3*sizeof(int));
-        for(int j=0; j<3; j++)
+    grid g = (grid)malloc(N*sizeof(int*));
+    for(int i=0; i<N; i++){
+        *(g+i) = (int*)malloc(N*sizeof(int));
+        for(int j=0; j<N; j++)
             *(*(g+i)+j) = EMPTY;
     }
     return g;
@@ -15,34 +21,48 @@ grid create_empty_grid(void){
 
 result check_line(line l, grid g){
     result r=0;
-    for(int i=0; i<3; i++){
+    for(int i=0; i<N; i++){
         r+=g[l][i];
     }
-    if(r != O_WINS*3 && r!=X_WINS*3)
+    if(r != O_WINS*N && r!=X_WINS*N)
         return DRAW;
-    return r/3;
+    return r/N;
 }
 
 result check_col(col c, grid g){
     result r=0;
-    for(int i=0; i<3; i++){
+    for(int i=0; i<N; i++){
         r+=g[i][c];
     }
-    if(r!= O_WINS*3 && r!=X_WINS*3)
+    if(r!= O_WINS*N && r!=X_WINS*N)
         return DRAW;
-    return r/3;
+    return r/N;
 }
-
+//TODO
 result check_diag(grid g) {
-    if((g[0][0] == g[1][1] && g[1][1]==g[2][2]) || (g[0][2]==g[1][1] && g[1][1]==g[2][0]))
-        return g[1][1]!=EMPTY ? g[1][1] : DRAW;
+    result r1=0, r2=0;
+    for(int i=0; i<N; i++){
+        for(int j=0; j<N; j++){
+            if(i==j)
+                r1+=g[i][j];
+            else if(j+i == N-1)
+                r2+=g[i][j];
 
-    return DRAW;
+        }
+    }
+    if(r1!= O_WINS*N && r1!=X_WINS*N && r2!= O_WINS*N && r2!=X_WINS*N)
+        return DRAW;
+    return (r1== O_WINS*N || r1==X_WINS*N) ? r1/N : r2/N;
+
+    // if((g[0][0] == g[1][1] && g[1][1]==g[2][2]) || (g[0][2]==g[1][1] && g[1][1]==g[2][0]))
+    //     return g[1][1]!=EMPTY ? g[1][1] : DRAW;
+
+    // return DRAW;
 }
 
 int empty_cells(grid g){
-    for(int i=0; i<3; i++)
-        for(int j=0; j<3; j++)
+    for(int i=0; i<N; i++)
+        for(int j=0; j<N; j++)
             if(g[i][j] == EMPTY) 
                 return 1;
 
@@ -51,7 +71,7 @@ int empty_cells(grid g){
 
 result game_state(grid g){
     result res;
-    for(int i=0; i<3; i++)
+    for(int i=0; i<N; i++)
         if((res=check_line(i, g)) != DRAW || (res=check_col(i, g)) != DRAW)
             return res;
     
@@ -75,11 +95,23 @@ char celltochar(int cell) {
 }
 
 void printg(grid g){
-    puts("  0 1 2");
-    puts("  _ _ _");
-    for(int i = 0; i<3; i++){
-        printf("%d|%c|%c|%c|\n", i, celltochar(g[i][0]), celltochar(g[i][1]), celltochar(g[i][2]));
-        puts("  - - -");
+    printf("  ");
+    for(int i = 0; i<N; i++)
+        printf("%d ", i);
+    puts("");
+    printf("  ");
+    for(int i = 0; i<N; i++)
+        printf("_ ");
+    puts("");
+    for(int i = 0; i<N; i++){
+        printf("%d|", i);
+        for(int j = 0; j<N; j++)
+            printf("%c|", celltochar(g[i][j]));
+        puts("");
+        printf("  ");
+        for(int j = 0; j<N; j++)
+            printf("_ ");
+        puts("");
     }
 
     puts("");
@@ -102,8 +134,8 @@ void random_player(int player, grid g) {
     //seed should be initialized before calling this function
     int x, y;
     do{
-        x = rand()%3;
-        y = rand()%3; 
+        x = rand()%N;
+        y = rand()%N; 
     }while(g[y][x] != EMPTY);
 
     g[y][x] = player;
@@ -125,8 +157,8 @@ int minimax(grid g, int maximizingPlayer) {
     int value;
     if(maximizingPlayer==X){
         value = -2;
-        for(int i=0; i<3; i++){
-            for(int j=0; j<3; j++){
+        for(int i=0; i<N; i++){
+            for(int j=0; j<N; j++){
                 if(g[i][j] == EMPTY){
                     g[i][j] = X;
                     value = max(value, minimax(g, O));
@@ -138,8 +170,8 @@ int minimax(grid g, int maximizingPlayer) {
 
     if(maximizingPlayer==O){
         value = 2;
-        for(int i=0; i<3; i++){
-            for(int j=0; j<3; j++){
+        for(int i=0; i<N; i++){
+            for(int j=0; j<N; j++){
                 if(g[i][j] == EMPTY){
                     g[i][j] = O;
                     value = min(value, minimax(g, X));
@@ -156,8 +188,8 @@ int minimax(grid g, int maximizingPlayer) {
 void bestMove(grid g) {
     int bestScore = -2, score;
     int x, y;
-    for(int i=0; i<3; i++){
-            for(int j=0; j<3; j++){
+    for(int i=0; i<N; i++){
+            for(int j=0; j<N; j++){
                 if(g[i][j] == EMPTY){
                     g[i][j] = X;
                     score = minimax(g, O);
@@ -173,3 +205,137 @@ void bestMove(grid g) {
     g[x][y] = X;
 
 }
+
+void MinMax(grid g) {
+    int score = INT_MAX;
+    int x=0, y=0, valeur;
+
+    for(int i=0; i<N; i++)
+        for(int j=0; j<N; j++) {
+            if(g[i][j] == EMPTY) {
+                g[i][j] = X;
+                valeur = Max_abp(g, INT_MIN, INT_MAX);
+                if(score > valeur){
+                    score = valeur;
+                    x=i;
+                    y=j;
+                }
+                g[i][j] = EMPTY;
+            }
+        }
+     g[x][y] = X;
+    
+}
+
+int Max(grid g) {
+    switch(game_state(g)){
+        case O_WINS:
+            return 10;
+        case X_WINS:
+            return -10;
+        case DRAW: 
+            return 0;
+    }
+
+    int score = INT_MIN, valeur;
+    for(int i=0; i<N; i++)
+        for(int j=0; j<N; j++) {
+
+            if(g[i][j] == EMPTY) {
+                g[i][j] = O;
+                valeur = Min(g);
+                if(score<valeur) 
+                    score = valeur;
+                g[i][j] = EMPTY;
+            }
+        }
+    
+    return score;
+}
+
+int Max_abp(grid g, int alpha, int beta) {
+    switch(game_state(g)){
+        case O_WINS:
+            return 10;
+        case X_WINS:
+            return -10;
+        case DRAW: 
+            return 0;
+    }
+
+    int score = INT_MIN, valeur;
+    for(int i=0; i<N; i++)
+        for(int j=0; j<N; j++) {
+
+            if(g[i][j] == EMPTY) {
+                g[i][j] = O;
+                valeur = Min_abp(g, alpha, beta);
+                g[i][j] = EMPTY;
+                
+                if(score<valeur) 
+                    score = valeur;
+                if(valeur >= beta)
+                    return score;
+                if(valeur > alpha)
+                    alpha = valeur;
+            }
+        }
+    
+    return score;
+}
+
+int Min(grid g) {
+    switch(game_state(g)){
+        case O_WINS:
+            return 10;
+        case X_WINS:
+            return -10;
+        case DRAW: 
+            return 0;
+    }
+
+    int score = INT_MAX, valeur;
+    for(int i=0; i<N; i++)
+        for(int j=0; j<N; j++) {
+            if(g[i][j] == EMPTY) {
+                g[i][j] = X;
+                valeur = Max(g);
+                if(score>valeur) 
+                    score = valeur;
+                g[i][j] = EMPTY;
+            }
+        }
+    
+    return score;
+}
+
+int Min_abp(grid g, int alpha, int beta) {
+    switch(game_state(g)){
+        case O_WINS:
+            return 10;
+        case X_WINS:
+            return -10;
+        case DRAW: 
+            return 0;
+    }
+
+    int score = INT_MAX, valeur;
+    for(int i=0; i<N; i++)
+        for(int j=0; j<N; j++) {
+            if(g[i][j] == EMPTY) {
+                g[i][j] = X;
+                valeur = Max_abp(g, alpha, beta);
+                g[i][j] = EMPTY;
+                
+                if(score>valeur) 
+                    score = valeur;
+                if(valeur <= alpha)
+                    return score;
+                if(valeur < beta)
+                    beta = valeur;
+            }
+        }
+    
+    return score;
+}
+

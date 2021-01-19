@@ -10,6 +10,10 @@ typedef int result;
 #define NOT_FINISHED 555
 #define EMPTY 666
 
+extern int N;
+
+void setN(int);
+
 grid create_empty_grid(void);
 result check_line(line, grid);
 result check_col(col, grid);
@@ -30,3 +34,8 @@ int max(int, int);
 int min(int, int);
 int minimax(grid, int);
 void bestMove(grid);
+void MinMax(grid);
+int Min(grid);
+int Max(grid);
+int Min_abp(grid, int, int);
+int Max_abp(grid, int, int);
