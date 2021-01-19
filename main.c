@@ -1,5 +1,5 @@
 #include "ez-draw.h"
-#include "morpion/tictactoe.h"
+#include "core/tictactoe.h"
 
 #include <stdio.h>
 #include <stdio_ext.h>

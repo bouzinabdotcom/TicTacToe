@@ -1,5 +1,5 @@
-all: main.c ez-draw.c morpion/tictactoe.c
-	gcc -o main main.c ez-draw.c morpion/tictactoe.c -lX11 -lXext 
+all: main.c ez-draw.c core/tictactoe.c
+	gcc -o morpion main.c ez-draw.c core/tictactoe.c -lX11 -lXext 
 
 
 clean: 
