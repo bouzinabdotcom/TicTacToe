@@ -58,6 +58,8 @@ void make_move_on_click(Ez_event *ev) {
                 ez_draw_text (ev->win, EZ_MC, l/2, w/2, "DRAW");
             else 
                 ez_draw_text (ev->win, EZ_MC, l/2, w/2, "%s WINS", r==X_WINS ? "X" : "O");
+            
+            ez_draw_text (ev->win, EZ_MC, l/2, w-10, "r: replay     q: quit", r==X_WINS ? "X" : "O");
 
 
         }
@@ -65,17 +67,29 @@ void make_move_on_click(Ez_event *ev) {
 
 } 
 
+void init_game(int);
+
+void handle_key_press(Ez_event *ev) {
+    if(strcmp(ev->key_string, "q")==0)
+        ez_window_destroy(ev->win);
+    
+    else if (strcmp(ev->key_string, "r") == 0) {
+        ez_window_destroy(ev->win);
+        init_game(N);
+    }
+}
+
 
 void win1_on_event (Ez_event *ev)                /* Called by ez_main_loop() */
 {                                                /* for each event on win1   */
     switch (ev->type) {
         case Expose   : win1_on_expose(ev); break;
         case ButtonPress : make_move_on_click(ev); break;
+        case KeyPress: handle_key_press(ev); break;
     }
 }
 
 void init_game(int size) {
-    if(ez_init() < 0) exit(1);
     N = size;
     ez_window_create(l, w, "TicTacToe", win1_on_event);
 
@@ -83,9 +97,6 @@ void init_game(int size) {
     g = create_empty_grid(); 
     
 
-    ez_main_loop();
-
-    exit(0);
 
 }
 
@@ -97,6 +108,7 @@ void init_game(int size) {
 
 int main() {
 
+    if(ez_init() < 0) exit(1);
     
     char answer;
     int temp;
@@ -113,4 +125,7 @@ int main() {
     init_game(N);
 
 
+    ez_main_loop();
+
+    exit(0);
 }
