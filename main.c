@@ -16,6 +16,8 @@ result r;
 
 void win1_on_expose(Ez_event *ev) {
     for(int i=1; i<N; i++){
+        ez_set_thick(4);
+
         ez_draw_line(ev->win,  i*l/N,  0, i*l/N,  w);
         ez_draw_line(ev->win,  0,  i*w/N, w, i*w/N);
 
@@ -44,11 +46,12 @@ void make_move_on_click(Ez_event *ev) {
         g[y][x] = X;
         printg(g);
 
-        if(game_state(g) != NOT_FINISHED) {
+        r = game_state(g);
+        printf("%d\n", check_diag(g));
+        if(r != NOT_FINISHED) {
             
             ez_set_color(ez_black);
             ez_fill_rectangle(ev->win, 0, 0, l-1, w-1);
-            r = game_state(g);
             print_result(r);
             ez_set_color(ez_white);
             if(r == DRAW)
@@ -75,7 +78,6 @@ void init_game(int size) {
     if(ez_init() < 0) exit(1);
     N = size;
     ez_window_create(l, w, "TicTacToe", win1_on_event);
-    ez_set_thick(3);
 
     
     g = create_empty_grid(); 

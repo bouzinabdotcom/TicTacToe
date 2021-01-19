@@ -45,7 +45,7 @@ result check_diag(grid g) {
         for(int j=0; j<N; j++){
             if(i==j)
                 r1+=g[i][j];
-            else if(j+i == N-1)
+            if(j+i == N-1)
                 r2+=g[i][j];
 
         }
